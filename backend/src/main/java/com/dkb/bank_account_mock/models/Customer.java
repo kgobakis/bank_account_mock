@@ -18,18 +18,12 @@ public class Customer {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-
+    @Column(name = "accountid")
+    private Long accountid;
     @Column(name = "email")
     private String email;
 
     public Customer() {
-    }
-
-    public Customer(Long id, String firstName, String lastName, String email) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
     }
 
     public Long getId() {
@@ -48,20 +42,28 @@ public class Customer {
         this.firstName = firstName;
     }
 
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getLastName() {
         return this.lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Long getAccountid() {
+        return this.accountid;
+    }
+
+    public void setAccountid(Long accountid) {
+        this.accountid = accountid;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }

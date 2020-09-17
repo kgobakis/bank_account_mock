@@ -1,21 +1,28 @@
 package com.dkb.bank_account_mock.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import java.util.List;
 
-@Entity
-@Table(name = "CustomerAccount")
 public class CustomerAccount {
+    private Customer customer;
+    private List<Account> accounts;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long customerAccountId;
+    public CustomerAccount() {
+    }
 
-    private Long customerId;
-    private Long accountId;
+    public Customer getCustomer() {
+        return this.customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public List<Account> getAccounts() {
+        return this.accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
 }

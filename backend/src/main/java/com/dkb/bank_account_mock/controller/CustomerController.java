@@ -1,10 +1,6 @@
 package com.dkb.bank_account_mock.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import com.dkb.bank_account_mock.models.Customer;
+import com.dkb.bank_account_mock.models.CustomerAccount;
 import com.dkb.bank_account_mock.repository.AccountRepository;
 import com.dkb.bank_account_mock.repository.CustomerRepository;
 
@@ -17,11 +13,15 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @GetMapping("/customer/{id}")
-    public Optional<Customer> getCustomerById(@PathVariable("id") Long id) {
-
-        return customerRepository.findById(id);
+    public CustomerAccount getCustomerAccountById(@PathVariable("id") Long id) {
+        CustomerAccount customerAccount = new CustomerAccount();
+        customerAccount.setCustomer(customerRepository.findById(id).get());
+        customerAccount.setAccounts(accountRepository.findListById(customerAccount.getCustomer().getAccountid()));
+        return customerAccount;
     }
 
     @GetMapping("/")

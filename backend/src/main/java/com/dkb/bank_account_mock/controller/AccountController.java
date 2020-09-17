@@ -3,11 +3,11 @@ package com.dkb.bank_account_mock.controller;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import com.dkb.bank_account_mock.models.Account;
-import com.dkb.bank_account_mock.models.AccountType;
+import com.dkb.bank_account_mock.models.Transaction;
 import com.dkb.bank_account_mock.repository.AccountRepository;
+import com.dkb.bank_account_mock.repository.TransactionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,31 +22,19 @@ public class AccountController {
 
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    TransactionRepository transactionRepository;
 
+    /* Deposit money into a specified bank account */
     @PostMapping("/addingmoney/iban")
     public void addingMoneyUsingIban(@RequestParam String IBAN, @RequestParam double amount) {
         Account currentAccount = accountRepository.findByIBAN(IBAN);
 
-        if (currentAccount.getBalance() - amount > 0)
-            accountRepository.setAccountBalance(currentAccount.getId(), currentAccount.getBalance() + amount);
+        accountRepository.setAccountBalance(currentAccount.getId(), currentAccount.getBalance() + amount);
 
     }
 
-    @PostMapping("/addingmoney/id")
-    public void addingMoneyUsingId(@RequestParam String id, @RequestParam double amount) {
-        Account currentAccount = accountRepository.findById(id);
-
-        if (currentAccount.getBalance() - amount > 0)
-            accountRepository.setAccountBalance(currentAccount.getId(), currentAccount.getBalance() + amount);
-
-    }
-
-    @GetMapping("/account/balance")
-    public double getAccountBalance(@RequestParam String IBAN) {
-        Account currentAccount = accountRepository.findByIBAN(IBAN);
-        return currentAccount.getBalance();
-    }
-
+    /* Transfer some money across two bank accounts */
     @PostMapping("/transfermoney")
     public void transferMoney(@RequestParam Long fromid, @RequestParam Long toid) {
         Account fromAccount = accountRepository.findById(fromid).orElseThrow();
@@ -67,6 +55,14 @@ public class AccountController {
 
     }
 
+    /* Show current balance of the specific bank account */
+    @GetMapping("/account/balance")
+    public double getAccountBalance(@RequestParam String IBAN) {
+        Account currentAccount = accountRepository.findByIBAN(IBAN);
+        return currentAccount.getBalance();
+    }
+
+    /* Filter accounts by account type */
     @GetMapping("/accounts/type")
     public List<Account> listAccountByType() {
         List<Account> allAccounts = accountRepository.findAll();
@@ -74,4 +70,11 @@ public class AccountController {
         return allAccounts;
     }
 
+    /* Show a transaction history */
+    @GetMapping("/account/transactions")
+    public List<Transaction> listAccountTransactions(@RequestParam String IBAN) {
+        Account currentAccount = accountRepository.findByIBAN(IBAN);
+
+        return transactionRepository.findListById(currentAccount.getId());
+    }
 }

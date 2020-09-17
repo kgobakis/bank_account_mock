@@ -16,8 +16,8 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(name = "accountID")
-    private Long accountID;
+    @Column(name = "accountid")
+    private Long accountid;
     @Column(name = "timestamp")
     private Date timestamp;
     @Column(name = "amount")
@@ -37,12 +37,12 @@ public class Transaction {
         this.id = id;
     }
 
-    public Long getAccountID() {
-        return this.accountID;
+    public Long getAccountid() {
+        return this.accountid;
     }
 
-    public void setAccountID(Long accountID) {
-        this.accountID = accountID;
+    public void setAccountid(Long accountID) {
+        this.accountid = accountID;
     }
 
     public Date getTimestamp() {

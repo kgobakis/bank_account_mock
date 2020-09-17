@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 
 import com.dkb.bank_account_mock.models.Account;
@@ -24,6 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findByIBAN(@Param("IBAN") String i);
 
     @Transactional
-    @Query("FROM Account a WHERE a.id = :id")
-    Account findById(@Param("id") String id);
+    @Query("FROM Account a WHERE a.customerid = :id")
+    List<Account> findListById(@Param("id") Long id);
+
 }

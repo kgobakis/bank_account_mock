@@ -17,6 +17,8 @@ public class Account {
 
     @Column(name = "IBAN")
     private String IBAN;
+    @Column(name = "customerid")
+    private Long customerid;
     @Column(name = "type")
     private Long type;
     @Column(name = "description")
@@ -41,6 +43,14 @@ public class Account {
 
     public void setIBAN(String IBAN) {
         this.IBAN = IBAN;
+    }
+
+    public Long getCustomerid() {
+        return this.customerid;
+    }
+
+    public void setCustomerid(Long customerid) {
+        this.customerid = customerid;
     }
 
     public Long getType() {
