@@ -28,6 +28,7 @@ CREATE TABLE Account
     (250) DEFAULT NULL,
     balance DECIMAL
     (6, 2) NOT NULL DEFAULT 0,
+    locked BIT DEFAULT 0,
     CONSTRAINT type FOREIGN KEY (type) REFERENCES AccountType(id)
 
 );

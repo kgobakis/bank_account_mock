@@ -42,4 +42,14 @@ INSERT INTO "TRANSACTION"
     (id, accountid , timestamp, amount)
 VALUES
     (1, 2,
-        '2008-10-29', 20.00);
+        '2020-09-08', 20.00);
+INSERT INTO "TRANSACTION"
+    (id, accountid , timestamp, amount)
+VALUES
+    (2, 2,
+        '2018-10-29', 340.00);
+INSERT INTO "TRANSACTION"
+    (id, accountid , timestamp, amount)
+VALUES
+    (3, 2,
+        '2017-10-29', 100.00);

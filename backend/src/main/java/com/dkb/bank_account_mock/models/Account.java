@@ -25,9 +25,8 @@ public class Account {
     private String description;
     @Column(name = "balance")
     private double balance;
-
-    public Account() {
-    }
+    @Column(name = "locked")
+    private int locked;
 
     public Long getId() {
         return this.id;
@@ -75,6 +74,14 @@ public class Account {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public int getLocked() {
+        return this.locked;
+    }
+
+    public void setLocked(int locked) {
+        this.locked = locked;
     }
 
 }

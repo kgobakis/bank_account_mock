@@ -29,29 +29,40 @@ public class AccountController {
     @PostMapping("/addingmoney/iban")
     public void addingMoneyUsingIban(@RequestParam String IBAN, @RequestParam double amount) {
         Account currentAccount = accountRepository.findByIBAN(IBAN);
-
-        accountRepository.setAccountBalance(currentAccount.getId(), currentAccount.getBalance() + amount);
+        if (currentAccount != null)
+            accountRepository.setAccountBalance(currentAccount.getId(), currentAccount.getBalance() + amount);
 
     }
 
     /* Transfer some money across two bank accounts */
     @PostMapping("/transfermoney")
-    public void transferMoney(@RequestParam Long fromid, @RequestParam Long toid) {
-        Account fromAccount = accountRepository.findById(fromid).orElseThrow();
-        Account toAccount = accountRepository.findById(toid).orElseThrow();
+    public void transferMoney(@RequestParam String fromIBAN, @RequestParam String toIBAN, @RequestParam double amount) {
+        Account fromAccount = accountRepository.findByIBAN(fromIBAN);
+        Account toAccount = accountRepository.findByIBAN(toIBAN);
 
-        // AccountType fromType =
-        // accountTypeRepository.findById(fromAccount.getType()).orElseThrow();
-        // AccountType toType =
-        // accountTypeRepository.findById(fromAccount.getType()).orElseThrow();
-        // // If it is a checking account
-        // if (fromType == AccountType.CHECKING) {
+        // Checking if account is locked
+        if (fromAccount.getLocked() == 1 || toAccount.getLocked() == 1) {
+            return;
+        }
 
-        // } else if (fromType == AccountType.SAVINGS) {
+        // If it is a checking account
+        if (fromAccount.getType() == 0) {
+            accountRepository.setAccountBalance(fromAccount.getId(), fromAccount.getBalance() - amount);
+            accountRepository.setAccountBalance(toAccount.getId(), toAccount.getBalance() + amount);
+        }
+        // If it is a savings account
+        else if (fromAccount.getType() == 1) {
+            // Only transfer if receiving account is checking
+            if (toAccount.getType() == 0) {
+                accountRepository.setAccountBalance(fromAccount.getId(), fromAccount.getBalance() - amount);
+                accountRepository.setAccountBalance(toAccount.getId(), toAccount.getBalance() + amount);
+            }
+        }
+        // If it is a private account then transfer is not possible, private loan
+        // account only allow for purchases
+        else {
 
-        // } else {
-
-        // }
+        }
 
     }
 
@@ -70,11 +81,43 @@ public class AccountController {
         return allAccounts;
     }
 
-    /* Show a transaction history */
+    /*
+     * Show a transaction history: For an account, specified by IBAN, show the
+     * transaction history
+     */
     @GetMapping("/account/transactions")
     public List<Transaction> listAccountTransactions(@RequestParam String IBAN) {
         Account currentAccount = accountRepository.findByIBAN(IBAN);
 
         return transactionRepository.findListById(currentAccount.getId());
     }
+
+    /*
+     * Bonus * open account
+     */
+    @PostMapping("/account/add")
+    public void openAccount(@RequestParam("id") Long id, @RequestParam("customerid") Long customerid,
+            @RequestParam("IBAN") String iban, @RequestParam("type") int type, @RequestParam("balance") double balance)
+
+    {
+        accountRepository.setAccountAdd(id, customerid, iban, type, balance);
+    }
+
+    /*
+     * Bonus * account locking
+     */
+    @PostMapping("/account/lock")
+    public void accountLock(@RequestParam String IBAN) {
+        accountRepository.setAccountLock(IBAN, 1);
+    }
+
+    /*
+     * Bonus * account locking
+     */
+    @PostMapping("/account/unlock")
+    public void accountUnlock(@RequestParam String IBAN) {
+        accountRepository.setAccountUnlock(IBAN, 0);
+
+    }
+
 }

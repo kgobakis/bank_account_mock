@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -21,6 +20,22 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Modifying
     @Query("UPDATE Account a set a.balance = :balance WHERE a.id = :id")
     void setAccountBalance(@Param("id") Long id, @Param("balance") double balance);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Account a set a.locked = :n WHERE a.IBAN = :IBAN")
+    void setAccountLock(@Param("IBAN") String i, @Param("n") int n);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Account a set a.locked = :n WHERE a.IBAN = :IBAN")
+    void setAccountUnlock(@Param("IBAN") String i, @Param("n") int n);
+
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO Account (id,customerID,iban , type, balance) values (:id,:customerid, :IBAN, :type, :balance)", nativeQuery = true)
+    void setAccountAdd(@Param("id") Long id, @Param("customerid") Long customerid, @Param("IBAN") String iban,
+            @Param("type") int type, @Param("balance") double balance);
 
     @Transactional
     @Query("FROM Account a WHERE a.IBAN = :IBAN")
