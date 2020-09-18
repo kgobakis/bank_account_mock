@@ -13,6 +13,6 @@ git clone [project]
 
 ## Schema
 
-
+![alt text](https://github.com/kgobakis/bank_account_mock/blob/master/DBK.jpeg)
 
 
