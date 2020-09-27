@@ -2,9 +2,8 @@ package com.dkb.bank_account_mock.controller;
 
 import com.dkb.bank_account_mock.models.Account;
 import com.dkb.bank_account_mock.models.Transaction;
-import com.dkb.bank_account_mock.repository.AccountRepository;
-import com.dkb.bank_account_mock.repository.TransactionRepository;
 import com.dkb.bank_account_mock.service.AccountServiceImp;
+import com.dkb.bank_account_mock.service.TransactionServiceImp;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -14,67 +13,39 @@ import java.util.List;
 @RestController
 public class AccountController {
 
-    AccountRepository accountRepository;
-    TransactionRepository transactionRepository;
-    AccountServiceImp accountServiceImp;
 
-    public AccountController(AccountRepository accountRepository, TransactionRepository transactionRepository, AccountServiceImp accountServiceImp) {
-        this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
+    AccountServiceImp accountServiceImp;
+    TransactionServiceImp transactionServiceImp;
+
+    public AccountController(AccountServiceImp accountServiceImp, TransactionServiceImp transactionServiceImp) {
+
         this.accountServiceImp = accountServiceImp;
+        this.transactionServiceImp = transactionServiceImp;
     }
 
     /* Deposit money into a specified bank account */
     @PatchMapping("/add-money/iban")
-    public void addingMoneyUsingIban(@RequestBody String IBAN, @RequestBody double amount) {
+    public void addingMoneyUsingIban(@RequestParam String IBAN, @RequestParam double amount) {
         accountServiceImp.addMoneyByIBAN(IBAN, amount);
     }
 
     /* Transfer some money across two bank accounts */
     @PostMapping("/transfer-money/iban")
     public void transferMoney(@RequestBody String fromIBAN, @RequestBody String toIBAN, @RequestBody double amount) {
-        Account fromAccount = accountRepository.findByIBAN(fromIBAN);
-        Account toAccount = accountRepository.findByIBAN(toIBAN);
-
-        // Checking if account is locked
-//        if (fromAccount.isLocked() || toAccount.isLocked() ) {
-//            return;
-//        }
-
-        // If it is a checking account
-        if (fromAccount.getType() == 0) {
-            accountRepository.setAccountBalance(fromAccount.getId(), fromAccount.getBalance() - amount);
-            accountRepository.setAccountBalance(toAccount.getId(), toAccount.getBalance() + amount);
-        }
-        // If it is a savings account
-        else if (fromAccount.getType() == 1) {
-            // Only transfer if receiving account is checking
-            if (toAccount.getType() == 0) {
-                accountRepository.setAccountBalance(fromAccount.getId(), fromAccount.getBalance() - amount);
-                accountRepository.setAccountBalance(toAccount.getId(), toAccount.getBalance() + amount);
-            }
-        }
-        // If it is a private account then transfer is not possible, private loan
-        // account only allow for purchases
-        else {
-
-        }
-
+        accountServiceImp.transferMoney(fromIBAN, toIBAN, amount);
     }
 
     /* Show current balance of the specific bank account */
     @GetMapping("/account/balance")
     public double getAccountBalance(@RequestBody String IBAN) {
-        Account currentAccount = accountRepository.findByIBAN(IBAN);
+        Account currentAccount = accountServiceImp.findByIBAN(IBAN);
         return currentAccount.getBalance();
     }
 
     /* Filter accounts by account type */
     @GetMapping("/accounts/type")
     public List<Account> listAccountByType() {
-        List<Account> allAccounts = accountRepository.findAll();
-        Collections.sort(allAccounts, Comparator.comparing(Account::getType));
-        return allAccounts;
+        return accountServiceImp.listAccountsByType();
     }
 
     /*
@@ -83,9 +54,7 @@ public class AccountController {
      */
     @GetMapping("/account/transactions")
     public List<Transaction> listAccountTransactions(@RequestParam String IBAN) {
-        Account currentAccount = accountRepository.findByIBAN(IBAN);
-
-        return transactionRepository.findListById(currentAccount.getId());
+        return transactionServiceImp.findTransactionByIBAN(IBAN);
     }
 
     /*
@@ -94,7 +63,7 @@ public class AccountController {
     @PostMapping("/account/add")
     public void openAccount(@RequestParam("id") Long id, @RequestParam("customerid") Long customerid,
                             @RequestParam("IBAN") String iban, @RequestParam("type") int type, @RequestParam("balance") double balance) {
-        accountRepository.setAccountAdd(id, customerid, iban, type, balance);
+        accountServiceImp.setAccountAdd(id, customerid, iban, type, balance);
     }
 
     /*
@@ -102,7 +71,7 @@ public class AccountController {
      */
     @PatchMapping("/account/lock")
     public void accountLock(@RequestParam String IBAN) {
-        accountRepository.toggleAccountLockedByIBAN(IBAN);
+        accountServiceImp.toggleAccountLockedByIBAN(IBAN);
     }
 
 
