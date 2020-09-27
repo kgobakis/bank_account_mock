@@ -4,6 +4,7 @@ import com.dkb.bank_account_mock.models.Account;
 import com.dkb.bank_account_mock.models.Transaction;
 import com.dkb.bank_account_mock.repository.AccountRepository;
 import com.dkb.bank_account_mock.repository.TransactionRepository;
+import com.dkb.bank_account_mock.service.AccountServiceImp;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -15,19 +16,18 @@ public class AccountController {
 
     AccountRepository accountRepository;
     TransactionRepository transactionRepository;
+    AccountServiceImp accountServiceImp;
 
-    public AccountController(AccountRepository accountRepository, TransactionRepository transactionRepository) {
+    public AccountController(AccountRepository accountRepository, TransactionRepository transactionRepository, AccountServiceImp accountServiceImp) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.accountServiceImp = accountServiceImp;
     }
 
     /* Deposit money into a specified bank account */
-    @PostMapping("/add-money/iban")
+    @PatchMapping("/add-money/iban")
     public void addingMoneyUsingIban(@RequestBody String IBAN, @RequestBody double amount) {
-        Account currentAccount = accountRepository.findByIBAN(IBAN);
-        if (currentAccount != null)
-            accountRepository.setAccountBalance(currentAccount.getId(), currentAccount.getBalance() + amount);
-
+        accountServiceImp.addMoneyByIBAN(IBAN, amount);
     }
 
     /* Transfer some money across two bank accounts */
@@ -65,7 +65,6 @@ public class AccountController {
     /* Show current balance of the specific bank account */
     @GetMapping("/account/balance")
     public double getAccountBalance(@RequestBody String IBAN) {
-        System.out.println("YOYO----> " + IBAN);
         Account currentAccount = accountRepository.findByIBAN(IBAN);
         return currentAccount.getBalance();
     }
@@ -99,20 +98,13 @@ public class AccountController {
     }
 
     /*
-     * Bonus * account locking
+     * Bonus * account locking/unlocking
      */
-    @PostMapping("/account/lock")
+    @PatchMapping("/account/lock")
     public void accountLock(@RequestParam String IBAN) {
-        accountRepository.setAccountLock(IBAN, 1);
+        accountRepository.toggleAccountLockedByIBAN(IBAN);
     }
 
-    /*
-     * Bonus * account locking
-     */
-    @PostMapping("/account/unlock")
-    public void accountUnlock(@RequestParam String IBAN) {
-        accountRepository.setAccountUnlock(IBAN, 0);
 
-    }
 
 }

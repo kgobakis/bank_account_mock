@@ -1,6 +1,7 @@
 package com.dkb.bank_account_mock.models;
 
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -17,6 +18,8 @@ public class Account {
     private Long type;
     private String description;
     private double balance;
+
+    @Type(type = "numeric_boolean")
     private boolean locked;
 
 
